@@ -13,7 +13,7 @@ import mongoose from 'mongoose';
 // --- GET: Fetch a single feedback link by its ID ---
 export async function GET(
   request: Request,
-  { params }: { params: { linkId: string } } // Corrected signature
+  { params }: { params: Promise<{ linkId: string }> } // App Router expects Promise-wrapped params
 ) {
   await dbConnect();
   const session = await getServerSession(authOptions);
@@ -27,7 +27,7 @@ export async function GET(
   }
 
   try {
-    const { linkId } = params; // Corrected access
+  const { linkId } = await params; // Await promise-wrapped params
     if (!mongoose.Types.ObjectId.isValid(linkId)) {
       return Response.json(
         { success: false, message: 'Invalid link ID' },
@@ -77,7 +77,7 @@ export async function GET(
 // --- PUT: Update a specific feedback link ---
 export async function PUT(
   request: Request,
-  { params }: { params: { linkId: string } } // Corrected signature
+  { params }: { params: Promise<{ linkId: string }> }
 ) {
   await dbConnect();
   const session = await getServerSession(authOptions);
@@ -91,7 +91,7 @@ export async function PUT(
   }
 
   try {
-    const { linkId } = params; // Corrected access
+  const { linkId } = await params; // Await promise-wrapped params
     if (!mongoose.Types.ObjectId.isValid(linkId)) {
       return Response.json(
         { success: false, message: 'Invalid link ID' },
@@ -164,7 +164,7 @@ export async function PUT(
 // --- DELETE: Delete a specific feedback link and its submissions ---
 export async function DELETE(
   request: Request,
-  { params }: { params: { linkId: string } } // Corrected signature
+  { params }: { params: Promise<{ linkId: string }> }
 ) {
   await dbConnect();
   const session = await getServerSession(authOptions);
@@ -180,7 +180,7 @@ export async function DELETE(
   const transactionSession = await mongoose.startSession();
   try {
     transactionSession.startTransaction();
-    const { linkId } = params; // Corrected access
+  const { linkId } = await params; // Await promise-wrapped params
 
     if (!mongoose.Types.ObjectId.isValid(linkId)) {
       await transactionSession.abortTransaction();

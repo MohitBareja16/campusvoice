@@ -129,10 +129,15 @@ export default function FeedbackPage() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Feedback for {linkInfo.title}</h1>
           <div className="flex items-center justify-center space-x-2">
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              {(linkInfo.class as any).className}
-            </Badge>
-            <Badge variant="outline">{(linkInfo.class as any).semester}</Badge>
+            {(() => {
+              const classInfo = linkInfo.class as { className?: string; semester?: string } | undefined;
+              return (
+                <>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">{classInfo?.className}</Badge>
+                  <Badge variant="outline">{classInfo?.semester}</Badge>
+                </>
+              );
+            })()}
           </div>
         </div>
 

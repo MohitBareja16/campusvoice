@@ -24,7 +24,7 @@ export interface Class extends Document {
   className: string;
   semester: string;
   professor: Types.ObjectId;      // 👈 reference to User/Professor
-  feedbackLinks: FeedbackLink[];
+  feedbackLinks: Types.ObjectId[];
   createdAt: Date;
 }
 

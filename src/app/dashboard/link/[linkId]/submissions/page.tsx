@@ -43,7 +43,7 @@ export default function SubmissionsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [linkId]);
+  }, [linkId, toast]);
 
   useEffect(() => {
     if(linkId) {
@@ -113,7 +113,7 @@ export default function SubmissionsPage() {
             </Card>
           ) : (
             submissions.map((submission) => (
-              <Card key={(submission._id as any).toString()} className="hover:shadow-sm transition-shadow">
+              <Card key={String(submission._id)} className="hover:shadow-sm transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-medium">Anonymous Feedback</CardTitle>

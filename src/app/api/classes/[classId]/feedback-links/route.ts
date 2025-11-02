@@ -4,7 +4,7 @@ import dbConnect from '@/lib/dbConnect';
 import { ClassModel, FeedbackLinkModel } from '@/model/User';
 import { User } from 'next-auth';
 import { feedbackLinkSchema } from '@/schemas/feedbackLinkSchema';
-import mongoose, { Types } from 'mongoose';
+import mongoose from 'mongoose';
 import { randomUUID } from 'crypto';
 
 // --- POST: Create a new feedback link for a specific class ---
@@ -78,7 +78,7 @@ export async function POST(
     await newFeedbackLink.save();
 
     // Add the new link's ID to the class's feedbackLinks array
-    parentClass.feedbackLinks.push(newFeedbackLink._id as any);
+  parentClass.feedbackLinks.push(newFeedbackLink._id as mongoose.Types.ObjectId);
     await parentClass.save();
 
     return Response.json(

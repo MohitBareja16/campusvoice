@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useCallback, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useCallback, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
 import { ApiResponse, Class, FeedbackLink } from '@/types/ApiResponse';
 import { Loader2 } from 'lucide-react';
@@ -26,15 +26,9 @@ import { Plus, Copy, Eye, Trash2, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
-// Correctly type the props for a Next.js App Router page
-interface ClassDetailsPageProps {
-  params: Promise<{
-    classId: string;
-  }>;
-}
-
-export default function ClassDetailsPage({ params }: ClassDetailsPageProps) {
-  const { classId } = use(params);
+export default function ClassDetailsPage() {
+  const routeParams = useParams() as { classId?: string } | undefined;
+  const classId = routeParams?.classId ?? undefined;
   const router = useRouter();
   const toast = useToast();
 
@@ -61,7 +55,7 @@ export default function ClassDetailsPage({ params }: ClassDetailsPageProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [classId, router]);
+  }, [classId, router, toast]);
 
   useEffect(() => {
     if (classId) {
@@ -154,7 +148,7 @@ export default function ClassDetailsPage({ params }: ClassDetailsPageProps) {
             <CardDescription>Manage your feedback collection links for this class.</CardDescription>
           </CardHeader>
           <CardContent>
-            {(classDetails.feedbackLinks as FeedbackLink[]).length === 0 ? (
+            {((classDetails.feedbackLinks as unknown) as FeedbackLink[]).length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-gray-500 mb-4">No feedback links created yet.</p>
                 <Button onClick={() => setIsModalOpen(true)} variant="outline">
@@ -174,8 +168,8 @@ export default function ClassDetailsPage({ params }: ClassDetailsPageProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(classDetails.feedbackLinks as FeedbackLink[]).map((link) => (
-                    <TableRow key={(link._id as any).toString()}>
+                  {((classDetails.feedbackLinks as unknown) as FeedbackLink[]).map((link) => (
+                    <TableRow key={String((link as unknown as { _id: unknown })._id)}>
                       <TableCell className="font-medium">{link.title}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
@@ -231,7 +225,7 @@ export default function ClassDetailsPage({ params }: ClassDetailsPageProps) {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteLink(link._id as any)}>
+                                <AlertDialogAction onClick={() => handleDeleteLink(String((link as unknown as { _id: unknown })._id))}>
                                   Delete
                                 </AlertDialogAction>
                               </AlertDialogFooter>

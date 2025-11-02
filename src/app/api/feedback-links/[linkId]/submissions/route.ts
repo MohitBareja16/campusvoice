@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 // --- GET: Fetch all submissions for a specific feedback link ---
 export async function GET(
   request: Request,
-  { params }: { params: { linkId: string } }
+  { params }: { params: Promise<{ linkId: string }> }
 ) {
   await dbConnect();
   const session = await getServerSession(authOptions);
@@ -23,7 +23,7 @@ export async function GET(
 
   try {
     // FIX: Access params directly, it is not a promise.
-    const { linkId } = params;
+  const { linkId } = await params;
     if (!mongoose.Types.ObjectId.isValid(linkId)) {
       return Response.json(
         { success: false, message: 'Invalid feedback link ID' },

@@ -43,12 +43,12 @@ export default function SignUpPage() {
         setIsCheckingUsername(true);
         setUsernameMessage(''); // Reset message
         try {
-          const response = await axios.get(`/api/check-username-unique?username=${username}`);
+          const response = await axios.get<{ message: string }>(`/api/check-username-unique?username=${username}`);
           setUsernameMessage(response.data.message);
         } catch (error) {
-          const axiosError = error as AxiosError<any>;
+          const axiosError = error as AxiosError<{ message?: string }>;
           setUsernameMessage(
-            axiosError.response?.data.message ?? 'Error checking username'
+            axiosError.response?.data?.message ?? 'Error checking username'
           );
         } finally {
           setIsCheckingUsername(false);
@@ -71,9 +71,9 @@ export default function SignUpPage() {
       
     } catch (error) {
       console.error('Error in sign-up of user', error);
-      const axiosError = error as AxiosError<any>;
-      let errorMessage = axiosError.response?.data.message;
-      
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage = axiosError.response?.data?.message;
+
       toast.error('Sign-up failed.', {
         description: errorMessage ?? 'An unexpected error occurred.',
       });

@@ -14,7 +14,7 @@ import Link from "next/link"
 
 
 export default function DashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [classes, setClasses] = useState<Class[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,21 +24,32 @@ export default function DashboardPage() {
     setIsLoading(true);
     try {
       const response = await axios.get<ApiResponse>('/api/classes');
-      console.log("Classes API response:", response.data); // debug
       setClasses(response.data.classes || []); // 👈 use "data"
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
+      // If user is not authenticated, show a clear message and don't keep retrying
+      if (axiosError.response?.status === 401) {
+        toast.error('Not authenticated', {
+          description: 'Please sign in to view your classes.',
+        });
+        setClasses([]);
+        return;
+      }
+
       toast.error('Failed to fetch classes', {
         description: axiosError.response?.data.message ?? 'An error occurred.',
       });
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
-    fetchClasses();
-  }, [fetchClasses]);
+    // Only fetch classes when the session is authenticated
+    if (status === 'authenticated') {
+      fetchClasses();
+    }
+  }, [fetchClasses, status]);
 
   const handleCreateClass = async (className: string, semester: string) => {
     try {
@@ -100,7 +111,7 @@ export default function DashboardPage() {
               ))
             ) : (
               <div className="col-span-full text-center py-10 border-2 border-dashed rounded-lg">
-                <p className="text-gray-500 mb-4">You haven't created any classes yet.</p>
+                <p className="text-gray-500 mb-4">You haven&apos;t created any classes yet.</p>
                 <Button onClick={() => setIsModalOpen(true)} variant="outline">
                   <Plus className="w-4 h-4 mr-2" />
                   Create Your First Class

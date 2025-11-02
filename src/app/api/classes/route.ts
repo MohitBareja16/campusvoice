@@ -6,7 +6,7 @@ import { User } from 'next-auth';
 import { classSchema } from '@/schemas/classSchema';
 
 // --- GET: Fetch all classes for the logged-in professor ---
-export async function GET(request: Request) {
+export async function GET() {
   await dbConnect();
   const session = await getServerSession(authOptions);
   const user: User | undefined = session?.user;

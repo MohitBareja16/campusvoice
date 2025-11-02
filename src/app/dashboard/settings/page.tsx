@@ -60,7 +60,7 @@ export default function SettingsPage() {
       });
       // Update the session to reflect the new username
       await update({ username: data.name });
-    } catch (error) {
+    } catch {
       toast.error('Update Failed', {
         description: 'Could not save your profile changes.',
       });
@@ -78,7 +78,7 @@ export default function SettingsPage() {
         description: 'Your password has been changed successfully.',
       });
       passwordForm.reset(); // Clear the form fields
-    } catch (error) {
+    } catch {
       toast.error('Update Failed', {
         description: 'Could not update your password. Please check your current password.',
       });

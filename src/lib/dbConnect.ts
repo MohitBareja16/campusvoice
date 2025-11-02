@@ -29,7 +29,9 @@ if (!cached) {
 async function dbConnect(): Promise<typeof mongoose> {
   // If a connection is already cached, return it immediately
   if (cached.conn) {
-    console.log("Using cached database connection.");
+    // Already connected — return cached connection without noisy logging.
+    // This function is intentionally called on every API route invocation,
+    // so avoid logging here to prevent repeated messages in production.
     return cached.conn;
   }
 
@@ -40,7 +42,10 @@ async function dbConnect(): Promise<typeof mongoose> {
     };
 
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      console.log("New database connection established.");
+      // Only log new connections during development for easier debugging
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("New database connection established.");
+      }
       return mongoose;
     });
   }

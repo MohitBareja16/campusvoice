@@ -4,7 +4,7 @@ import dbConnect from '@/lib/dbConnect';
 import { UserModel } from '@/model/User';
 import { User } from 'next-auth'; // The User type from next-auth is useful here
 
-export async function GET(request: Request) {
+export async function GET() {
   // 1. Connect to the database
   await dbConnect();
 

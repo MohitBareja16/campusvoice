@@ -17,16 +17,24 @@ export const authOptions: NextAuthOptions = {
       id: 'credentials',
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text' },
+        identifier: { label: 'Email or Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials: any): Promise<any> {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async authorize(credentials: any): Promise<any> {
         await dbConnect();
         try {
+          const identifier: string | undefined = credentials?.identifier;
+          const password: string | undefined = credentials?.password;
+
+          if (!identifier || !password) {
+            throw new Error('Missing credentials');
+          }
+
           const user = await UserModel.findOne({
             $or: [
-              { email: credentials.identifier },
-              { username: credentials.identifier },
+              { email: identifier },
+              { username: identifier },
             ],
           });
 
@@ -37,7 +45,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error('Please verify your account before logging in');
           }
           const isPasswordCorrect = await bcrypt.compare(
-            credentials.password,
+            password,
             user.password
           );
           if (isPasswordCorrect) {
@@ -45,16 +53,17 @@ export const authOptions: NextAuthOptions = {
           } else {
             throw new Error('Incorrect password');
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           // The error message from the try block is passed here
-          throw new Error(err.message || 'An error occurred during authorization');
+          const message = (err as Error)?.message ?? 'An error occurred during authorization';
+          throw new Error(message);
         }
       },
     }),
   ],
   callbacks: {
     // --- signIn callback to handle domain verification for Google ---
-    async signIn({ user, account, profile }) {
+  async signIn({ account, profile }) {
       if (account?.provider === 'google') {
         await dbConnect();
         try {

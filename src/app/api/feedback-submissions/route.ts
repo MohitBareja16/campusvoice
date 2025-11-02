@@ -1,7 +1,6 @@
 import dbConnect from '@/lib/dbConnect';
 import { FeedbackLinkModel, FeedbackSubmissionModel } from '@/model/User';
 import { feedbackSubmissionSchema } from '@/schemas/feedbackSubmissionSchema';
-import { z } from 'zod';
 
 export async function POST(request: Request) {
   await dbConnect();
@@ -38,7 +37,7 @@ export async function POST(request: Request) {
     await newSubmission.save();
 
     // 5. IMPORTANT: Add the new submission's ID to the link's submissions array
-    feedbackLink.submissions.push(newSubmission._id as any);
+  feedbackLink.submissions.push(newSubmission._id as import('mongoose').Types.ObjectId);
     
     // Save the updated feedback link document
     await feedbackLink.save();
